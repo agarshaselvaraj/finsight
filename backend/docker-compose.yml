@@ -1,0 +1,11 @@
+services:
+  mongodb:
+    image: mongo:8
+    container_name: expense-mongodb
+    ports:
+      - "27018:27017"
+    volumes:
+      - expense-mongo-data:/data/db
+
+volumes:
+  expense-mongo-data:
