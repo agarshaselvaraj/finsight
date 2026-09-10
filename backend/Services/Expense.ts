@@ -3,7 +3,7 @@ const add = async (objtoSave: any) => {
     return Expense.create(objtoSave);
 }
 const get = async (criteria: any = {}) => {
-    return Expense.find(criteria);
+    return Expense.find(criteria).populate("category");
 }
 const deleteExpense = async (criteria: any = {}) => {
     return Expense.deleteOne(criteria);

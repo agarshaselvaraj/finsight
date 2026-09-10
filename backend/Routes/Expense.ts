@@ -1,9 +1,10 @@
 import express from 'express';
 import ExpenseController from '../Controllers/Expense';
+import authMiddleware from '../Config/AuthMiddleware';
 const router = express.Router();
-router.post("/", ExpenseController.add);
-router.get("/:userId", ExpenseController.getExpense);
-router.get("/:id", ExpenseController.getExpenseById);
-router.delete("/:id", ExpenseController.deleteExpense);
-router.put("/:id", ExpenseController.updateExpense);
+router.post("/", authMiddleware, ExpenseController.add);
+router.get("/:userId", authMiddleware, ExpenseController.getExpense);
+router.get("/:id", authMiddleware, ExpenseController.getExpenseById);
+router.delete("/:id", authMiddleware, ExpenseController.deleteExpense);
+router.put("/:id", authMiddleware, ExpenseController.updateExpense);
 export default router;

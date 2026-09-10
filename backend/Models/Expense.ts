@@ -1,23 +1,25 @@
 import mongoose, { Schema, Document } from 'mongoose';
 interface IExpense extends Document {
-    userId: string,
+    userId: mongoose.Types.ObjectId,
     amount: number,
-    category: string,
+    category: mongoose.Types.ObjectId,
     description: string,
     date: Date,
     paymentMethod: string,
 }
 const ExpenseSchema = new Schema<IExpense>({
     userId: {
-        type: String,
-        require: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
     amount: {
         type: Number,
         required: true
     },
     category: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
         required: true,
     },
     description: {

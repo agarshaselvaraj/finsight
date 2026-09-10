@@ -21,7 +21,7 @@ const CategorySchema = new Schema({
     },
     isSystem: {
         type: Boolean,
-        default: true
+        default: false
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,

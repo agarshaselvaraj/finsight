@@ -1,9 +1,10 @@
 import express from 'express';
-import IncomeController from '../Controllers/Income.ts';
+import IncomeController from '../Controllers/Income';
+import authMiddleware from '../Config/AuthMiddleware';
 const router = express.Router();
-router.post("/", IncomeController.add);
-router.get("/", IncomeController.get);
-router.get("/:id", IncomeController.getIncomeId);
-router.delete("/:id", IncomeController.deleteIncome);
-router.put("/:id", IncomeController.updateIncome);
+router.post("/", authMiddleware, IncomeController.add);
+router.get("/", authMiddleware, IncomeController.get);
+router.get("/:id", authMiddleware, IncomeController.getIncomeId);
+router.delete("/:id", authMiddleware, IncomeController.deleteIncome);
+router.put("/:id", authMiddleware, IncomeController.updateIncome);
 export default router;

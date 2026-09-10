@@ -1,5 +1,5 @@
-import expess, { Request, Response } from 'express';
-import CategoryService from '../Services/Category.ts';
+import { Request, Response } from 'express';
+import CategoryService from '../Services/Category';
 
 const add = async (req: Request, res: Response) => {
     try {

@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import Userservice from '../Services/User'
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 const register = async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -30,17 +31,23 @@ const login = async (req: Request, res: Response) => {
     try {
         const findEmail = await Userservice.get({ email });
         if (findEmail.length == 0) {
-            return res.status(401).json("Email Not Registered");
+            return res.status(401).json({ message: "Email Not Registered" });
         }
 
         const ispasswordCorrect = await bcrypt.compare(password, findEmail[0].password);
         if (!ispasswordCorrect) {
-            return res.status(401).json("Password is Invalid");
+            return res.status(401).json({ message: "Password is Invalid" });
         }
+        const token = jwt.sign(
+            { userId: findEmail[0]._id },
+            process.env.JWT_SECRET!,
+            { expiresIn: "1d" }
+        );
         return res.status(200).json({
             message: "Login Successfully", user: {
                 name: findEmail[0].name,
                 email: findEmail[0].email,
+                token
 
             }
         })

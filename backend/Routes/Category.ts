@@ -1,9 +1,10 @@
 import express from 'express';
 import CategoryController from '../Controllers/Category';
+import authMiddleware from '../Config/AuthMiddleware';
 const router = express.Router();
-router.post("/", CategoryController.add);
-router.get("/", CategoryController.get);
+router.post("/", authMiddleware, CategoryController.add);
+router.get("/", authMiddleware, CategoryController.get);
 // router.get("/:id", CategoryController.getExpenseById);
-router.delete("/:id", CategoryController.deleteCategory);
-router.put("/:id", CategoryController.updateCategory);
+router.delete("/:id", authMiddleware, CategoryController.deleteCategory);
+router.put("/:id", authMiddleware, CategoryController.updateCategory);
 export default router;
