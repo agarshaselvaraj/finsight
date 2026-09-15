@@ -19,13 +19,14 @@ const add = async (req: Request, res: Response) => {
 }
 const get = async (req: Request, res: Response) => {
     try {
+        const { month } = req.query;
         const userId = req.user?.userId;
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized" })
         }
-        const data = await IncomeService.get({ userId });
-
-        return res.status(200).json({ message: "Income fetched successfully", data });
+        const data = await IncomeService.get({ userId, month });
+        const totalincome = data.reduce((total, item) => total + item.amount, 0);
+        return res.status(200).json({ message: "Income fetched successfully", data, totalincome });
 
 
     }
