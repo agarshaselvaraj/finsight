@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import ExpenseService from '../Services/Expense';
+
 const add = async (req: Request, res: Response) => {
     const { amount, category, description, date, paymentMethod } = req.body;
     const userId = req.user?.userId || req.body.userId;
@@ -27,13 +28,17 @@ const add = async (req: Request, res: Response) => {
 
 }
 const getExpense = async (req: Request, res: Response) => {
+    const { month } = req.query;
     const userId = req.user?.userId || req.params.userId;
     try {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized: UserId is required" });
         }
-        const data = await ExpenseService.get({ userId });
-        return res.status(200).json({ message: "Expenses fetched successfully", data });
+        const data = await ExpenseService.get({ userId, month });
+        const totalexpense = data.reduce((total, item) => total + item.amount, 0);
+
+
+        return res.status(200).json({ message: "Expenses fetched successfully", data, totalexpense });
     }
     catch (error: any) {
         console.log(error);
