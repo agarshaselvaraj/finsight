@@ -28,17 +28,34 @@ const add = async (req: Request, res: Response) => {
 
 }
 const getExpense = async (req: Request, res: Response) => {
-    const { month } = req.query;
+
+    const { month, category, limit, skip } = req.query;
     const userId = req.user?.userId || req.params.userId;
     try {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized: UserId is required" });
         }
-        const data = await ExpenseService.get({ userId, month });
-        const totalexpense = data.reduce((total, item) => total + item.amount, 0);
+
+        let data;
+        let totalexpense = 0;
+        let categoryBreakdown = [];
+        let totalRecords = 0;
+
+        if (category === "true") {
+            data = await ExpenseService.ExpenseSummary({ userId, month });
+            console.log("Expense Summary:", JSON.stringify(data, null, 2));
+            totalexpense = data?.[0]?.totalExpense?.[0]?.total || 0;
+            categoryBreakdown = data?.[0]?.categoryBreakdown || [];
 
 
-        return res.status(200).json({ message: "Expenses fetched successfully", data, totalexpense });
+        } else {
+            data = await ExpenseService.get({ userId, month, limit, skip });
+            totalRecords = await ExpenseService.count({ userId, month });
+            console.log("yy")
+            totalexpense = data.reduce((total: number, item: any) => total + item.amount, 0);
+        }
+
+        return res.status(200).json({ message: "Expenses fetched successfully", data, totalexpense, categoryBreakdown, totalRecords });
     }
     catch (error: any) {
         console.log(error);
@@ -112,4 +129,22 @@ const updateExpense = async (req: Request, res: Response) => {
     }
 
 }
-export default { add, getExpense, getExpenseById, deleteExpense, updateExpense };
+const weeklyTrends = async (req: Request, res: Response) => {
+    const userId = req.user?.userId;
+    const { week } = req.query;
+    try {
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized: User ID not found" });
+        }
+        if (!week) {
+            return res.status(400).json({ message: "Week is required" });
+        }
+        const data = await ExpenseService.weeklyTrends({ userId, week });
+        return res.status(200).json({ message: "Weekly trends fetched successfully", data })
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Failed to Fetch weekly trends", error })
+    }
+
+}
+export default { add, getExpense, getExpenseById, deleteExpense, updateExpense, weeklyTrends };

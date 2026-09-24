@@ -4,6 +4,7 @@ import authMiddleware from '../Config/AuthMiddleware';
 const router = express.Router();
 router.post("/", authMiddleware, ExpenseController.add);
 router.get("/", authMiddleware, ExpenseController.getExpense);
+router.get("/weekly-trends", authMiddleware, ExpenseController.weeklyTrends);
 router.get("/:id", authMiddleware, ExpenseController.getExpenseById);
 router.delete("/:id", authMiddleware, ExpenseController.deleteExpense);
 router.put("/:id", authMiddleware, ExpenseController.updateExpense);

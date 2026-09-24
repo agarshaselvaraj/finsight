@@ -30,11 +30,12 @@ const add = async (req: Request, res: Response) => {
 }
 const get = async (req: Request, res: Response) => {
     try {
+        const { month } = req.query;
         const UserId = req.user?.userId;
         if (!UserId) {
             return res.status(401).json({ message: "Unauthorized" })
         }
-        const data = await CategoryService.get({ $or: [{ userId: UserId }, { isSystem: true }] });
+        const data = await CategoryService.get({ $or: [{ userId: UserId }, { isSystem: true }], month });
         return res.status(200).json({ message: "Categories fetched Successfully", data: data });
     }
     catch (error) {
