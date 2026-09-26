@@ -3,7 +3,7 @@ import ExpenseService from '../Services/Expense';
 
 const add = async (req: Request, res: Response) => {
     const { amount, category, description, date, paymentMethod } = req.body;
-    const userId = req.user?.userId || req.body.userId;
+    const userId = req.user?.userId;
     if (!userId) {
         return res.status(401).json({ message: "Unauthorized: User ID not found" });
     }
@@ -30,7 +30,7 @@ const add = async (req: Request, res: Response) => {
 const getExpense = async (req: Request, res: Response) => {
 
     const { month, category, limit, skip } = req.query;
-    const userId = req.user?.userId || req.params.userId;
+    const userId = req.user?.userId;
     try {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized: UserId is required" });
@@ -51,7 +51,6 @@ const getExpense = async (req: Request, res: Response) => {
         } else {
             data = await ExpenseService.get({ userId, month, limit, skip });
             totalRecords = await ExpenseService.count({ userId, month });
-            console.log("yy")
             totalexpense = data.reduce((total: number, item: any) => total + item.amount, 0);
         }
 
@@ -65,17 +64,19 @@ const getExpense = async (req: Request, res: Response) => {
 const getExpenseById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized: User ID not found" });
+    }
     if (!id) {
         return res.status(400).json({ message: "Expense Id is required" });
     }
     try {
-        const criteria: any = { _id: id };
-        if (userId) criteria.userId = userId;
+        const criteria: any = { _id: id, userId };
         const data = await ExpenseService.get(criteria);
         if (!data || (Array.isArray(data) && data.length === 0)) {
             return res.status(404).json({ message: "Expense not found" });
         }
-        return res.status(200).json({ message: "Expense data fetched successfully", data });
+        return res.status(200).json({ message: "Expense data fetched successfully", data: Array.isArray(data) ? data[0] : data });
     }
     catch (error: any) {
         console.log(error);
@@ -86,13 +87,18 @@ const getExpenseById = async (req: Request, res: Response) => {
 const deleteExpense = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized: User ID not found" });
+    }
     if (!id) {
         return res.status(400).json({ message: "Expense Id is required" });
     }
     try {
-        const criteria: any = { _id: id };
-        if (userId) criteria.userId = userId;
+        const criteria: any = { _id: id, userId };
         const data = await ExpenseService.deleteExpense(criteria);
+        if (data.deletedCount === 0) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
         return res.status(200).json({ message: "Expense deleted successfully", data });
     }
     catch (error: any) {
@@ -104,13 +110,15 @@ const deleteExpense = async (req: Request, res: Response) => {
 const updateExpense = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user?.userId;
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized: User ID not found" });
+    }
     const { amount, category, description, date, paymentMethod } = req.body;
     if (!id) {
         return res.status(400).json({ message: "Expense Id is required" });
     }
     try {
-        const criteria: any = { _id: id };
-        if (userId) criteria.userId = userId;
+        const criteria: any = { _id: id, userId };
         const data = await ExpenseService.updateExpense(
             criteria,
             {
@@ -121,6 +129,9 @@ const updateExpense = async (req: Request, res: Response) => {
                 paymentMethod
             }
         );
+        if (data.matchedCount === 0) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
         return res.status(200).json({ message: "Expense Updated Successfully", data });
     }
     catch (error: any) {

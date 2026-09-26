@@ -29,7 +29,7 @@ const login = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Email and Password required" });
     }
     try {
-        const findEmail = await Userservice.get({ email });
+        const findEmail = await Userservice.get({ email }, true);
         if (findEmail.length == 0) {
             return res.status(401).json({ message: "Email Not Registered" });
         }
@@ -52,8 +52,9 @@ const login = async (req: Request, res: Response) => {
             }
         })
     }
-    catch (error) {
+    catch (error: any) {
         console.log(error);
+        return res.status(500).json({ message: "Failed to login" });
     }
 
 

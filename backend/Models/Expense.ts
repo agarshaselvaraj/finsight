@@ -7,7 +7,7 @@ interface IExpense extends Document {
     date: Date,
     paymentMethod: string,
 }
-import Category from "../Models/Category";
+
 const ExpenseSchema = new Schema<IExpense>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,

@@ -57,6 +57,9 @@ const ExpenseSummary = async (criteria: any = {}) => {
             $lt: enddate
         };
     }
+    if (criteria.userId && typeof criteria.userId === "string") {
+        criteria.userId = new mongoose.Types.ObjectId(criteria.userId);
+    }
     return Expense.aggregate([
         { $match: criteria },
         {
